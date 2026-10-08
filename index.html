@@ -11,6 +11,7 @@
     .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
     .glass-input { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.15); }
     .glass-input:focus { border-color: #3b82f6; outline: none; }
+    .glass-input:disabled { opacity: 0.6; cursor: not-allowed; background: rgba(15, 23, 42, 0.3); }
     .tab-active { background-color: #2563eb; color: #ffffff; }
     .tab-inactive { background-color: rgba(51, 65, 85, 0.5); color: #94a3b8; }
     .tab-inactive:hover { background-color: rgba(51, 65, 85, 0.8); color: #f8fafc; }
@@ -62,7 +63,7 @@
         <div class="flex items-center space-x-3">
           <div class="text-right hidden sm:block">
             <div id="user-display-name" class="text-xs font-bold text-slate-200">User</div>
-            <div id="user-role-badge" class="text-[10px] text-blue-400 uppercase tracking-wider">Support Member</div>
+            <div id="user-role-badge" class="text-[10px] text-blue-400 uppercase tracking-wider">SUPPORT MEMBER</div>
           </div>
           <button onclick="logout()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 transition-all flex items-center space-x-1.5">
             <i class="fa-solid fa-right-from-bracket"></i>
@@ -86,7 +87,7 @@
           </button>
           <button onclick="switchTab('kpis')" id="tab-kpis" class="tab-inactive px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center space-x-2">
             <i class="fa-solid fa-sliders"></i>
-            <span>Goal & KPI Manager</span>
+            <span>Goal & KPI View</span>
           </button>
           <button onclick="switchTab('users')" id="tab-users" class="tab-inactive px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center space-x-2">
             <i class="fa-solid fa-users-gear"></i>
@@ -209,12 +210,17 @@
       <!-- TAB 3: GOAL & KPI MANAGER -->
       <section id="view-kpis" class="hidden space-y-6">
         <div class="glass-card p-6 rounded-2xl space-y-6">
-          <div class="border-b border-slate-800 pb-4">
-            <h2 class="text-base font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-sliders text-blue-400"></i>
-              <span>KPI Goal & Scoresheet Rules Manager</span>
-            </h2>
-            <p class="text-xs text-slate-400 mt-1">Adjust target goals and ABCD letter grade threshold limits</p>
+          <div class="border-b border-slate-800 pb-4 flex justify-between items-center">
+            <div>
+              <h2 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-blue-400"></i>
+                <span id="kpi-title-label">KPI Goal & Scoresheet Rules</span>
+              </h2>
+              <p class="text-xs text-slate-400 mt-1" id="kpi-subtitle-label">Target goals and ABCD letter grade threshold limits</p>
+            </div>
+            <span id="kpi-read-only-badge" class="hidden text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-400 px-3 py-1 rounded-lg border border-slate-700">
+              <i class="fa-solid fa-lock mr-1"></i> Read Only
+            </span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -222,11 +228,11 @@
               <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">1. Daily Target Goals</h3>
               <div>
                 <label class="block text-xs text-slate-400 mb-1">Daily Slide / Task Target Output</label>
-                <input type="number" id="input-daily-target" value="25" class="glass-input w-full px-4 py-2.5 rounded-xl text-sm text-white">
+                <input type="number" id="input-daily-target" value="25" class="glass-input kpi-field w-full px-4 py-2.5 rounded-xl text-sm text-white">
               </div>
               <div>
                 <label class="block text-xs text-slate-400 mb-1">Target Name / Metric Label</label>
-                <input type="text" id="input-metric-label" value="Slides Completed" class="glass-input w-full px-4 py-2.5 rounded-xl text-sm text-white">
+                <input type="text" id="input-metric-label" value="Slides Completed" class="glass-input kpi-field w-full px-4 py-2.5 rounded-xl text-sm text-white">
               </div>
             </div>
 
@@ -235,25 +241,25 @@
               <div class="grid grid-cols-2 gap-3">
                 <div>
                   <label class="block text-[11px] text-emerald-400 mb-1">Grade A Min (%)</label>
-                  <input type="number" value="100" class="glass-input w-full px-3 py-2 rounded-lg text-xs text-white">
+                  <input type="number" value="100" class="glass-input kpi-field w-full px-3 py-2 rounded-lg text-xs text-white">
                 </div>
                 <div>
                   <label class="block text-[11px] text-blue-400 mb-1">Grade B Min (%)</label>
-                  <input type="number" value="85" class="glass-input w-full px-3 py-2 rounded-lg text-xs text-white">
+                  <input type="number" value="85" class="glass-input kpi-field w-full px-3 py-2 rounded-lg text-xs text-white">
                 </div>
                 <div>
                   <label class="block text-[11px] text-amber-400 mb-1">Grade C Min (%)</label>
-                  <input type="number" value="70" class="glass-input w-full px-3 py-2 rounded-lg text-xs text-white">
+                  <input type="number" value="70" class="glass-input kpi-field w-full px-3 py-2 rounded-lg text-xs text-white">
                 </div>
                 <div>
                   <label class="block text-[11px] text-red-400 mb-1">Grade D (&lt; %)</label>
-                  <input type="number" value="70" class="glass-input w-full px-3 py-2 rounded-lg text-xs text-white">
+                  <input type="number" value="70" class="glass-input kpi-field w-full px-3 py-2 rounded-lg text-xs text-white">
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="pt-4 border-t border-slate-800 flex justify-end">
+          <div id="save-kpi-btn-container" class="pt-4 border-t border-slate-800 flex justify-end">
             <button onclick="saveKpis()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl shadow-lg transition-all">
               Save KPI Configurations
             </button>
@@ -323,6 +329,7 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let currentUser = null;
     let currentSupportName = "";
+    let userRole = "support";
 
     // LOGIN EVENT LISTENER
     document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -351,23 +358,52 @@
 
       document.getElementById('user-display-name').innerText = currentUser.email;
 
-      // FETCH PROFILE MAPPING FROM SUPABASE
+      // FETCH PROFILE MAPPING & ROLE FROM SUPABASE
       const { data: profile } = await supabaseClient
         .from('profiles')
         .select('designer_name, role')
         .eq('id', currentUser.id)
         .maybeSingle();
 
-      if (profile && profile.designer_name) {
-        currentSupportName = profile.designer_name;
+      if (profile) {
+        currentSupportName = profile.designer_name || currentUser.email.split('@')[0];
+        userRole = (profile.role || 'support').toLowerCase();
       } else {
-        // Fallback to name extracted from email if unassigned
         currentSupportName = currentUser.email.split('@')[0];
+        userRole = 'support';
       }
 
+      // UPDATE ROLE UI & PERMISSIONS
+      document.getElementById('user-role-badge').innerText = userRole.toUpperCase() + ' MEMBER';
       document.getElementById('active-support-name').innerText = currentSupportName;
+
+      applyRolePermissions(userRole);
       updateMetabaseUrl();
-      loadMappingsTable();
+      if (userRole === 'admin') loadMappingsTable();
+    }
+
+    // ROLE-BASED ACCESS CONTROL
+    function applyRolePermissions(role) {
+      const userMappingsBtn = document.getElementById('tab-users');
+      const saveBtnContainer = document.getElementById('save-kpi-btn-container');
+      const readOnlyBadge = document.getElementById('kpi-read-only-badge');
+      const kpiFields = document.querySelectorAll('.kpi-field');
+
+      if (role !== 'admin') {
+        // HIDE USER MAPPINGS TAB
+        userMappingsBtn.classList.add('hidden');
+
+        // DISABLE KPI EDITING (READ ONLY)
+        kpiFields.forEach(field => field.setAttribute('disabled', 'true'));
+        saveBtnContainer.classList.add('hidden');
+        readOnlyBadge.classList.remove('hidden');
+      } else {
+        // SHOW ALL ADMIN FEATURES
+        userMappingsBtn.classList.remove('hidden');
+        kpiFields.forEach(field => field.removeAttribute('disabled'));
+        saveBtnContainer.classList.remove('hidden');
+        readOnlyBadge.classList.add('hidden');
+      }
     }
 
     // UPDATE METABASE IFRAME FEED
@@ -387,10 +423,13 @@
     function switchTab(tabKey) {
       const tabs = ['feed', 'scorecard', 'kpis', 'users'];
       tabs.forEach(t => {
-        document.getElementById(`view-${t}`).classList.add('hidden');
+        const view = document.getElementById(`view-${t}`);
+        if (view) view.classList.add('hidden');
         const btn = document.getElementById(`tab-${t}`);
-        btn.classList.remove('tab-active');
-        btn.classList.add('tab-inactive');
+        if (btn) {
+          btn.classList.remove('tab-active');
+          btn.classList.add('tab-inactive');
+        }
       });
 
       document.getElementById(`view-${tabKey}`).classList.remove('hidden');
@@ -399,15 +438,16 @@
       activeBtn.classList.add('tab-active');
     }
 
-    // SAVE KPI SETTINGS
+    // SAVE KPI SETTINGS (ADMIN ONLY)
     function saveKpis() {
+      if (userRole !== 'admin') return;
       const goal = document.getElementById('input-daily-target').value;
       const label = document.getElementById('input-metric-label').value;
       document.getElementById('card-goal-display').innerText = `${goal} ${label}`;
       alert("KPI settings updated successfully!");
     }
 
-    // LOAD MAPPINGS LIST
+    // LOAD MAPPINGS LIST (ADMIN ONLY)
     async function loadMappingsTable() {
       const tbody = document.getElementById('mappings-table-body');
       tbody.innerHTML = '';
@@ -428,20 +468,12 @@
           `;
           tbody.innerHTML += row;
         });
-      } else {
-        tbody.innerHTML = `
-          <tr>
-            <td class="p-3 font-semibold text-white">${currentUser.email}</td>
-            <td class="p-3 text-blue-400 font-bold">${currentSupportName}</td>
-            <td class="p-3 uppercase text-[10px] text-slate-400">Support</td>
-            <td class="p-3"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px]">Active</span></td>
-          </tr>
-        `;
       }
     }
 
-    // ADD USER MAPPING
+    // ADD USER MAPPING (ADMIN ONLY)
     async function addUserMapping() {
+      if (userRole !== 'admin') return;
       const email = document.getElementById('map-email').value;
       const designer = document.getElementById('map-designer').value;
 
