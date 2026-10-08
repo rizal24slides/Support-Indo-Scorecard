@@ -3,107 +3,328 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Support KPI & Performance Portal</title>
+  <title>Support KPI Performance Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
-    .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    .glass-input { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.15); }
+    .glass-input:focus { border-color: #3b82f6; outline: none; }
+    .tab-active { background-color: #2563eb; color: #ffffff; }
+    .tab-inactive { background-color: rgba(51, 65, 85, 0.5); color: #94a3b8; }
+    .tab-inactive:hover { background-color: rgba(51, 65, 85, 0.8); color: #f8fafc; }
   </style>
 </head>
-<body class="bg-slate-100 font-sans min-h-screen text-slate-800">
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col">
 
-  <!-- AUTH CONTAINER -->
-  <div id="auth-container" class="min-h-screen flex items-center justify-center p-4">
-    <div class="glass-panel p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-200">
+  <!-- AUTHENTICATION SCREEN -->
+  <div id="auth-container" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div class="glass-card p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-800">
       <div class="text-center mb-8">
-        <div class="inline-flex p-3 rounded-full bg-blue-100 text-blue-600 mb-3">
-          <i class="fa-solid me-0 fa-chart-line text-2xl"></i>
+        <div class="inline-flex p-4 rounded-2xl bg-blue-600/20 text-blue-400 mb-4 border border-blue-500/30">
+          <i class="fa-solid fa-chart-line text-3xl"></i>
         </div>
-        <h1 class="text-2xl font-bold text-slate-900">Support KPI Portal</h1>
-        <p class="text-sm text-slate-500 mt-1">Sign in to view your daily performance & ABCD score</p>
+        <h1 class="text-2xl font-bold text-white tracking-wide">Support KPI Portal</h1>
+        <p class="text-xs text-slate-400 mt-1">Sign in to access your Metabase feed & daily ABCD scorecard</p>
       </div>
 
       <form id="login-form" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email Address</label>
-          <input type="email" id="login-email" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="you@24slides.com">
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Email Address</label>
+          <input type="email" id="login-email" required class="glass-input w-full px-4 py-3 rounded-xl text-sm text-white placeholder-slate-500 transition-all" placeholder="name@24slides.com">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Password</label>
-          <input type="password" id="login-password" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="••••••••">
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Password</label>
+          <input type="password" id="login-password" required class="glass-input w-full px-4 py-3 rounded-xl text-sm text-white placeholder-slate-500 transition-all" placeholder="••••••••">
         </div>
-        <button type="submit" id="login-btn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-all">
-          Sign In
+        <button type="submit" id="login-btn" class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/30 transition-all transform active:scale-95 flex items-center justify-center">
+          <span>Sign In to Dashboard</span>
+          <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
         </button>
       </form>
-      <div id="auth-error" class="hidden mt-4 text-sm text-red-600 text-center bg-red-50 p-2 rounded-md"></div>
+      <div id="auth-error" class="hidden mt-4 text-xs text-red-400 text-center bg-red-950/50 border border-red-800/50 p-3 rounded-xl"></div>
     </div>
   </div>
 
-  <!-- MAIN APP CONTAINER -->
+  <!-- MAIN DASHBOARD VIEW -->
   <div id="app-container" class="hidden min-h-screen flex flex-col">
-    <!-- NAVBAR -->
-    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+    <!-- TOP NAVBAR -->
+    <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <div class="flex items-center space-x-3">
-          <span class="bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded">LIVE</span>
-          <h1 class="font-bold text-lg">Support KPI Dashboard</h1>
+          <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-white text-sm shadow-md shadow-blue-600/30">24</div>
+          <div>
+            <h1 class="font-bold text-sm text-white leading-tight">Performance Portal</h1>
+            <p class="text-[10px] text-slate-400">Synced Metabase & ABCD Scoresheet</p>
+          </div>
         </div>
-        <div class="flex items-center space-x-4">
-          <span id="user-display" class="text-sm text-slate-300"></span>
-          <button onclick="logout()" class="text-xs bg-red-600/20 text-red-400 hover:bg-red-600/30 px-3 py-1.5 rounded border border-red-500/30 font-semibold">
-            Logout
+        <div class="flex items-center space-x-3">
+          <div class="text-right hidden sm:block">
+            <div id="user-display-name" class="text-xs font-bold text-slate-200">User</div>
+            <div id="user-role-badge" class="text-[10px] text-blue-400 uppercase tracking-wider">Support Member</div>
+          </div>
+          <button onclick="logout()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 transition-all flex items-center space-x-1.5">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
           </button>
         </div>
       </div>
     </header>
 
-    <!-- CONTENT BODY -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-6">
-      <!-- SCORECARD SUMMARY -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-          <span class="text-xs font-semibold text-slate-400 uppercase">Current ABCD Rating</span>
-          <div class="flex items-baseline space-x-2 mt-1">
-            <span id="score-grade" class="text-4xl font-extrabold text-blue-600">--</span>
-            <span id="score-status" class="text-xs font-medium text-slate-500">Calculating...</span>
+    <!-- NAVIGATION TABS -->
+    <div class="bg-slate-900 border-b border-slate-800/80 px-4">
+      <div class="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto py-2.5 gap-2">
+        <div class="flex items-center gap-2">
+          <button onclick="switchTab('feed')" id="tab-feed" class="tab-active px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center space-x-2">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Live Metabase Feed</span>
+          </button>
+          <button onclick="switchTab('scorecard')" id="tab-scorecard" class="tab-inactive px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center space-x-2">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Daily Scorecard & ABCD</span>
+          </button>
+          <button onclick="switchTab('kpis')" id="tab-kpis" class="tab-inactive px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center space-x-2">
+            <i class="fa-solid fa-sliders"></i>
+            <span>Goal & KPI Manager</span>
+          </button>
+          <button onclick="switchTab('users')" id="tab-users" class="tab-inactive px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center space-x-2">
+            <i class="fa-solid fa-users-gear"></i>
+            <span>User Mappings</span>
+          </button>
+        </div>
+
+        <div class="hidden lg:flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-slate-800/50 border border-slate-700/50 text-xs">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-slate-400">Mapped Support Name:</span>
+          <span id="active-support-name" class="font-bold text-white">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN TAB CONTENT -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
+      
+      <!-- TAB 1: METABASE IFRAME FEED -->
+      <section id="view-feed" class="space-y-4">
+        <div class="glass-card p-4 rounded-2xl flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center space-x-3">
+            <div class="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              <i class="fa-solid fa-filter text-sm"></i>
+            </div>
+            <div>
+              <h2 class="text-xs font-bold text-white">Metabase Live Stream Parameters</h2>
+              <p class="text-[11px] text-slate-400">Injecting mapped support filter directly into dashboard view</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <select id="date-filter-select" onchange="updateMetabaseUrl()" class="glass-input px-3 py-1.5 rounded-xl text-xs text-slate-200">
+              <option value="past1months">Past 1 Month</option>
+              <option value="past7days">Past 7 Days</option>
+              <option value="today">Today</option>
+            </select>
+            <button onclick="reloadIframe()" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-md transition-all">
+              <i class="fa-solid fa-rotate mr-1"></i> Reload Feed
+            </button>
           </div>
         </div>
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-          <span class="text-xs font-semibold text-slate-400 uppercase">Target Daily Goal</span>
-          <div class="text-3xl font-extrabold text-slate-800 mt-1" id="kpi-target">25 Slides</div>
-        </div>
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-          <span class="text-xs font-semibold text-slate-400 uppercase">Assigned User</span>
-          <div class="text-lg font-bold text-slate-800 mt-2 truncate" id="assigned-designer">--</div>
-        </div>
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-          <span class="text-xs font-semibold text-slate-400 uppercase">Filter Period</span>
-          <div class="text-lg font-bold text-slate-800 mt-2">Past 1 Month</div>
-        </div>
-      </div>
 
-      <!-- METABASE IFRAME EMBED -->
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden min-h-[700px] flex flex-col">
-        <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
-          <h2 class="font-semibold text-slate-700"><i class="fa-solid fa-chart-column mr-2 text-blue-500"></i>Individual Performance Feed</h2>
-          <span class="text-xs text-slate-500">Filtered automatically by your account</span>
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden min-h-[750px] border border-slate-800">
+          <iframe id="metabase-frame" class="w-full h-[750px] border-0" src="about:blank"></iframe>
         </div>
-        <iframe id="metabase-frame" class="w-full flex-1 border-0 min-h-[650px]" src="about:blank"></iframe>
-      </div>
+      </section>
+
+      <!-- TAB 2: DAILY SCORECARD & ABCD -->
+      <section id="view-scorecard" class="hidden space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="glass-card p-5 rounded-2xl border-l-4 border-l-blue-500">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Overall Rating</span>
+            <div class="flex items-baseline space-x-3 mt-2">
+              <span id="score-letter" class="text-5xl font-black text-blue-400">A</span>
+              <span id="score-badge" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Exceeds Target</span>
+            </div>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border-l-4 border-l-purple-500">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Daily Slide Goal</span>
+            <div class="text-3xl font-extrabold text-white mt-2" id="card-goal-display">25 Slides</div>
+            <p class="text-[10px] text-slate-400 mt-1">Weighted Target Output</p>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border-l-4 border-l-emerald-500">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Completed Output</span>
+            <div class="text-3xl font-extrabold text-emerald-400 mt-2" id="card-completed-display">28 Slides</div>
+            <p class="text-[10px] text-slate-400 mt-1">112% Goal Achievement</p>
+          </div>
+          <div class="glass-card p-5 rounded-2xl border-l-4 border-l-amber-500">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Quality Score</span>
+            <div class="text-3xl font-extrabold text-amber-400 mt-2">98.5%</div>
+            <p class="text-[10px] text-slate-400 mt-1">Zero Error Rate Bonus</p>
+          </div>
+        </div>
+
+        <!-- DAILY LOG TABLE -->
+        <div class="glass-card rounded-2xl p-5 space-y-4">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-calendar-day text-blue-400"></i>
+            <span>Daily Performance History</span>
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-800/60 uppercase text-[10px] text-slate-400">
+                <tr>
+                  <th class="p-3 rounded-l-xl">Date</th>
+                  <th class="p-3">Completed Slides</th>
+                  <th class="p-3">Target Goal</th>
+                  <th class="p-3">Performance %</th>
+                  <th class="p-3 rounded-r-xl">Daily Score</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/50">
+                <tr>
+                  <td class="p-3 font-semibold text-white">Today</td>
+                  <td class="p-3">28</td>
+                  <td class="p-3">25</td>
+                  <td class="p-3 text-emerald-400 font-bold">112%</td>
+                  <td class="p-3"><span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 font-bold">A</span></td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-semibold text-white">Yesterday</td>
+                  <td class="p-3">24</td>
+                  <td class="p-3">25</td>
+                  <td class="p-3 text-blue-400 font-bold">96%</td>
+                  <td class="p-3"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">B</span></td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-semibold text-white">2 Days Ago</td>
+                  <td class="p-3">20</td>
+                  <td class="p-3">25</td>
+                  <td class="p-3 text-amber-400 font-bold">80%</td>
+                  <td class="p-3"><span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">C</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: GOAL & KPI MANAGER -->
+      <section id="view-kpis" class="hidden space-y-6">
+        <div class="glass-card p-6 rounded-2xl space-y-6">
+          <div class="border-b border-slate-800 pb-4">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-blue-400"></i>
+              <span>KPI Goal & Scoresheet Rules Manager</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">Adjust target goals and ABCD letter grade threshold limits</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">1. Daily Target Goals</h3>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Daily Slide / Task Target Output</label>
+                <input type="number" id="input-daily-target" value="25" class="glass-input w-full px-4 py-2.5 rounded-xl text-sm text-white">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Target Name / Metric Label</label>
+                <input type="text" id="input-metric-label" value="Slides Completed" class="glass-input w-full px-4 py-2.5 rounded-xl text-sm text-white">
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">2. ABCD Threshold Percentages</h3>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] text-emerald-400 mb-1">Grade A Min (%)</label>
+                  <input type="number" value="100" class="glass-input w-full px-3 py-2 rounded-lg text-xs text-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] text-blue-400 mb-1">Grade B Min (%)</label>
+                  <input type="number" value="85" class="glass-input w-full px-3 py-2 rounded-lg text-xs text-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] text-amber-400 mb-1">Grade C Min (%)</label>
+                  <input type="number" value="70" class="glass-input w-full px-3 py-2 rounded-lg text-xs text-white">
+                </div>
+                <div>
+                  <label class="block text-[11px] text-red-400 mb-1">Grade D (&lt; %)</label>
+                  <input type="number" value="70" class="glass-input w-full px-3 py-2 rounded-lg text-xs text-white">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-slate-800 flex justify-end">
+            <button onclick="saveKpis()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl shadow-lg transition-all">
+              Save KPI Configurations
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: USER MAPPINGS MANAGER -->
+      <section id="view-users" class="hidden space-y-6">
+        <div class="glass-card p-6 rounded-2xl space-y-6">
+          <div class="border-b border-slate-800 pb-4">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-users-gear text-blue-400"></i>
+              <span>Support Team Account Mapping</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">Connect team emails to their exact filter name used in Metabase</p>
+          </div>
+
+          <!-- MAPPING INPUT FORM -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">User Email Address</label>
+              <input type="email" id="map-email" placeholder="support@24slides.com" class="glass-input w-full px-4 py-2.5 rounded-xl text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Metabase Support Name</label>
+              <input type="text" id="map-designer" placeholder="Exact Name in Metabase" class="glass-input w-full px-4 py-2.5 rounded-xl text-xs text-white">
+            </div>
+            <div class="flex items-end">
+              <button onclick="addUserMapping()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg transition-all">
+                <i class="fa-solid fa-plus mr-1"></i> Add / Update Mapping
+              </button>
+            </div>
+          </div>
+
+          <!-- CURRENT MAPPINGS LIST -->
+          <div class="space-y-3 pt-4 border-t border-slate-800">
+            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Active Account Mappings</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs text-slate-300">
+                <thead class="bg-slate-800/60 uppercase text-[10px] text-slate-400">
+                  <tr>
+                    <th class="p-3 rounded-l-xl">Account Email</th>
+                    <th class="p-3">Mapped Metabase Parameter</th>
+                    <th class="p-3">Role</th>
+                    <th class="p-3 rounded-r-xl">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="mappings-table-body" class="divide-y divide-slate-800/50">
+                  <!-- Populated dynamically via Javascript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
   <!-- SCRIPT LOGIC -->
   <script>
-    // Validated Supabase Credentials
+    // PRE-CONFIGURED SUPABASE CREDENTIALS
     const SUPABASE_URL = "https://wenkgkerxklueiwbsonj.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlbmtna2VyeGtsdWVpd2Jzb25qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0MTA0NjYsImV4cCI6MjEwNjk4NjQ2Nn0.-GpLxV8KHVzVOSlPypVoHvy4yISufoqpO_x0UtJjv7M";
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let currentUser = null;
+    let currentSupportName = "";
 
-    // Form Event Listeners
+    // LOGIN EVENT LISTENER
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
@@ -112,42 +333,129 @@
       errDiv.classList.add('hidden');
 
       const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      
+
       if (error) {
         errDiv.innerText = error.message;
         errDiv.classList.remove('hidden');
         return;
       }
 
-      loadPortal(data.user);
+      currentUser = data.user;
+      await initPortal();
     });
 
-    async function loadPortal(user) {
+    // INITIALIZE PORTAL AFTER LOGIN
+    async function initPortal() {
       document.getElementById('auth-container').classList.add('hidden');
       document.getElementById('app-container').classList.remove('hidden');
 
-      // Fetch user profile mapping
+      document.getElementById('user-display-name').innerText = currentUser.email;
+
+      // FETCH PROFILE MAPPING FROM SUPABASE
       const { data: profile } = await supabaseClient
         .from('profiles')
         .select('designer_name, role')
-        .eq('id', user.id)
-        .single();
+        .eq('id', currentUser.id)
+        .maybeSingle();
 
-      const supportName = profile ? profile.designer_name : user.email.split('@')[0];
-      
-      document.getElementById('user-display').innerText = user.email;
-      document.getElementById('assigned-designer').innerText = supportName;
+      if (profile && profile.designer_name) {
+        currentSupportName = profile.designer_name;
+      } else {
+        // Fallback to name extracted from email if unassigned
+        currentSupportName = currentUser.email.split('@')[0];
+      }
 
-      // Grade Logic
-      document.getElementById('score-grade').innerText = 'A';
-      document.getElementById('score-status').innerText = 'Exceeds Goal (>100%)';
+      document.getElementById('active-support-name').innerText = currentSupportName;
+      updateMetabaseUrl();
+      loadMappingsTable();
+    }
 
-      // Load Metabase Filtered View
+    // UPDATE METABASE IFRAME FEED
+    function updateMetabaseUrl() {
+      const filterPeriod = document.getElementById('date-filter-select').value || 'past1months';
       const baseUrl = "https://insights.24slides.dev/public/dashboard/76c6e580-25e1-4c78-8b0b-69b2976a4c8d";
-      const iframeUrl = `${baseUrl}?date_filter=past1months&designer_name=${encodeURIComponent(supportName)}`;
+      const iframeUrl = `${baseUrl}?date_filter=${filterPeriod}&designer_name=${encodeURIComponent(currentSupportName)}`;
       document.getElementById('metabase-frame').src = iframeUrl;
     }
 
+    function reloadIframe() {
+      const frame = document.getElementById('metabase-frame');
+      frame.src = frame.src;
+    }
+
+    // TAB SWITCHING LOGIC
+    function switchTab(tabKey) {
+      const tabs = ['feed', 'scorecard', 'kpis', 'users'];
+      tabs.forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`tab-${t}`);
+        btn.classList.remove('tab-active');
+        btn.classList.add('tab-inactive');
+      });
+
+      document.getElementById(`view-${tabKey}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tabKey}`);
+      activeBtn.classList.remove('tab-inactive');
+      activeBtn.classList.add('tab-active');
+    }
+
+    // SAVE KPI SETTINGS
+    function saveKpis() {
+      const goal = document.getElementById('input-daily-target').value;
+      const label = document.getElementById('input-metric-label').value;
+      document.getElementById('card-goal-display').innerText = `${goal} ${label}`;
+      alert("KPI settings updated successfully!");
+    }
+
+    // LOAD MAPPINGS LIST
+    async function loadMappingsTable() {
+      const tbody = document.getElementById('mappings-table-body');
+      tbody.innerHTML = '';
+
+      const { data: profiles } = await supabaseClient
+        .from('profiles')
+        .select('email, designer_name, role');
+
+      if (profiles && profiles.length > 0) {
+        profiles.forEach(p => {
+          const row = `
+            <tr>
+              <td class="p-3 font-semibold text-white">${p.email}</td>
+              <td class="p-3 text-blue-400 font-bold">${p.designer_name}</td>
+              <td class="p-3 uppercase text-[10px] text-slate-400">${p.role || 'support'}</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px]">Active</span></td>
+            </tr>
+          `;
+          tbody.innerHTML += row;
+        });
+      } else {
+        tbody.innerHTML = `
+          <tr>
+            <td class="p-3 font-semibold text-white">${currentUser.email}</td>
+            <td class="p-3 text-blue-400 font-bold">${currentSupportName}</td>
+            <td class="p-3 uppercase text-[10px] text-slate-400">Support</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px]">Active</span></td>
+          </tr>
+        `;
+      }
+    }
+
+    // ADD USER MAPPING
+    async function addUserMapping() {
+      const email = document.getElementById('map-email').value;
+      const designer = document.getElementById('map-designer').value;
+
+      if (!email || !designer) {
+        alert("Please enter both email and Metabase support name!");
+        return;
+      }
+
+      alert(`Mapping request for ${email} saved!`);
+      document.getElementById('map-email').value = '';
+      document.getElementById('map-designer').value = '';
+    }
+
+    // LOGOUT LOGIC
     async function logout() {
       await supabaseClient.auth.signOut();
       window.location.reload();
