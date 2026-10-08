@@ -1,56 +1,160 @@
-<!-- Add this script in your <head> -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support KPI & Performance Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+  </style>
+</head>
+<body class="bg-slate-100 font-sans min-h-screen text-slate-800">
 
-<script>
-  const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co';
-  const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <!-- AUTH CONTAINER -->
+  <div id="auth-container" class="min-h-screen flex items-center justify-center p-4">
+    <div class="glass-panel p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-200">
+      <div class="text-center mb-8">
+        <div class="inline-flex p-3 rounded-full bg-blue-100 text-blue-600 mb-3">
+          <i class="fa-solid me-0 fa-chart-line text-2xl"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900">Support KPI Portal</h1>
+        <p class="text-sm text-slate-500 mt-1">Sign in to view your daily performance & ABCD score</p>
+      </div>
 
-  // 1. SIGN UP FUNCTION (When assigning a user)
-  async function registerUser(email, password, designerName) {
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: { designer_name: designerName } // Passed into user_metadata
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email Address</label>
+          <input type="email" id="login-email" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="you@24slides.com">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Password</label>
+          <input type="password" id="login-password" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="••••••••">
+        </div>
+        <button type="submit" id="login-btn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-all">
+          Sign In
+        </button>
+      </form>
+      <div id="auth-error" class="hidden mt-4 text-sm text-red-600 text-center bg-red-50 p-2 rounded-md"></div>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div id="app-container" class="hidden min-h-screen flex flex-col">
+    <!-- NAVBAR -->
+    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <span class="bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded">LIVE</span>
+          <h1 class="font-bold text-lg">Support KPI Dashboard</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span id="user-display" class="text-sm text-slate-300"></span>
+          <button id="admin-tab-btn" class="hidden text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded border border-slate-700 text-blue-400 font-semibold">
+            <i class="fa-solid fa-gear mr-1"></i> Admin Settings
+          </button>
+          <button onclick="logout()" class="text-xs bg-red-600/20 text-red-400 hover:bg-red-600/30 px-3 py-1.5 rounded border border-red-500/30 font-semibold">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT BODY -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-6">
+      <!-- SCORECARD SUMMARY -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+          <span class="text-xs font-semibold text-slate-400 uppercase">Current ABCD Rating</span>
+          <div class="flex items-baseline space-x-2 mt-1">
+            <span id="score-grade" class="text-4xl font-extrabold text-blue-600">--</span>
+            <span id="score-status" class="text-xs font-medium text-slate-500">Calculating...</span>
+          </div>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+          <span class="text-xs font-semibold text-slate-400 uppercase">Target Daily Goal</span>
+          <div class="text-3xl font-extrabold text-slate-800 mt-1" id="kpi-target">25 Slides</div>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+          <span class="text-xs font-semibold text-slate-400 uppercase">Assigned User</span>
+          <div class="text-lg font-bold text-slate-800 mt-2 truncate" id="assigned-designer">--</div>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+          <span class="text-xs font-semibold text-slate-400 uppercase">Filter Period</span>
+          <div class="text-lg font-bold text-slate-800 mt-2">Past 1 Month</div>
+        </div>
+      </div>
+
+      <!-- METABASE IFRAME EMBED -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden min-h-[700px] flex flex-col">
+        <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+          <h2 class="font-semibold text-slate-700"><i class="fa-solid fa-chart-column mr-2 text-blue-500"></i>Individual Performance Feed</h2>
+          <span class="text-xs text-slate-500">Filtered automatically by your account</span>
+        </div>
+        <iframe id="metabase-frame" class="w-full flex-1 border-0 min-h-[650px]" src="about:blank"></iframe>
+      </div>
+    </main>
+  </div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    // Replace these placeholder strings with your actual Supabase credentials:
+    const SUPABASE_URL = "https://your-project.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOi...";
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Form Event Listeners
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const errDiv = document.getElementById('auth-error');
+      errDiv.classList.add('hidden');
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      
+      if (error) {
+        errDiv.innerText = error.message;
+        errDiv.classList.remove('hidden');
+        return;
       }
-    });
-    if (error) console.error("Error signing up:", error.message);
-    else console.log("User registered successfully:", data);
-  }
 
-  // 2. LOG IN FUNCTION
-  async function loginUser(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password
+      loadPortal(data.user);
     });
 
-    if (error) {
-      alert("Login failed: " + error.message);
-      return;
+    async function loadPortal(user) {
+      document.getElementById('auth-container').classList.add('hidden');
+      document.getElementById('app-container').classList.remove('hidden');
+
+      // Fetch user profile mapping
+      const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('designer_name, role')
+        .eq('id', user.id)
+        .single();
+
+      const supportName = profile ? profile.designer_name : user.email.split('@')[0];
+      
+      document.getElementById('user-display').innerText = user.email;
+      document.getElementById('assigned-designer').innerText = supportName;
+
+      // Sample Grade Logic - Can be populated from API/Metabase feeds
+      document.getElementById('score-grade').innerText = 'A';
+      document.getElementById('score-status').innerText = 'Exceeds Goal (>100%)';
+
+      // Load Metabase Filtered View
+      const baseUrl = "https://insights.24slides.dev/public/dashboard/76c6e580-25e1-4c78-8b0b-69b2976a4c8d";
+      const iframeUrl = `${baseUrl}?date_filter=past1months&designer_name=${encodeURIComponent(supportName)}`;
+      document.getElementById('metabase-frame').src = iframeUrl;
     }
 
-    // Fetch the logged-in user's mapped Metabase name
-    const user = data.user;
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('designer_name')
-      .eq('id', user.id)
-      .single();
-
-    const designerName = profile.designer_name;
-    loadDashboardForDesigner(designerName);
-  }
-
-  // 3. LOAD FILTERED METABASE DASHBOARD
-  function loadDashboardForDesigner(designerName) {
-    const baseUrl = "https://insights.24slides.dev/public/dashboard/76c6e580-25e1-4c78-8b0b-69b2976a4c8d";
-    // Filter Metabase by passing the designer name parameter
-    const iframeUrl = `${baseUrl}?date_filter=past1months&designer_name=${encodeURIComponent(designerName)}`;
-    
-    document.getElementById("dashboard-iframe").src = iframeUrl;
-  }
-</script>
-const SUPABASE_URL = "https://your-project.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOi...";
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.reload();
+    }
+  </script>
+</body>
+</html>
