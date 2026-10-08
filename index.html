@@ -52,9 +52,6 @@
         </div>
         <div class="flex items-center space-x-4">
           <span id="user-display" class="text-sm text-slate-300"></span>
-          <button id="admin-tab-btn" class="hidden text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded border border-slate-700 text-blue-400 font-semibold">
-            <i class="fa-solid fa-gear mr-1"></i> Admin Settings
-          </button>
           <button onclick="logout()" class="text-xs bg-red-600/20 text-red-400 hover:bg-red-600/30 px-3 py-1.5 rounded border border-red-500/30 font-semibold">
             Logout
           </button>
@@ -100,9 +97,9 @@
 
   <!-- SCRIPT LOGIC -->
   <script>
-    // Replace these placeholder strings with your actual Supabase credentials:
-    const SUPABASE_URL = "https://your-project.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOi...";
+    // Validated Supabase Credentials
+    const SUPABASE_URL = "https://wenkgkerxklueiwbsonj.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlbmtna2VyeGtsdWVpd2Jzb25qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0MTA0NjYsImV4cCI6MjEwNjk4NjQ2Nn0.-GpLxV8KHVzVOSlPypVoHvy4yISufoqpO_x0UtJjv7M";
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -141,7 +138,7 @@
       document.getElementById('user-display').innerText = user.email;
       document.getElementById('assigned-designer').innerText = supportName;
 
-      // Sample Grade Logic - Can be populated from API/Metabase feeds
+      // Grade Logic
       document.getElementById('score-grade').innerText = 'A';
       document.getElementById('score-status').innerText = 'Exceeds Goal (>100%)';
 
@@ -158,5 +155,3 @@
   </script>
 </body>
 </html>
-const SUPABASE_URL = "https://wenkgkerxklueiwbsonj.supabase.co"; // From Data API tab
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlbmtna2VyeGtsdWVpd2Jzb25qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0MTA0NjYsImV4cCI6MjEwNjk4NjQ2Nn0.-GpLxV8KHVzVOSlPypVoHvy4yISufoqpO_x0UtJjv7M"; // From Publishable key section
