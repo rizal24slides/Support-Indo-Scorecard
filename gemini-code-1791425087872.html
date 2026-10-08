@@ -1,0 +1,54 @@
+<!-- Add this script in your <head> -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co';
+  const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // 1. SIGN UP FUNCTION (When assigning a user)
+  async function registerUser(email, password, designerName) {
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: { designer_name: designerName } // Passed into user_metadata
+      }
+    });
+    if (error) console.error("Error signing up:", error.message);
+    else console.log("User registered successfully:", data);
+  }
+
+  // 2. LOG IN FUNCTION
+  async function loginUser(email, password) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+    if (error) {
+      alert("Login failed: " + error.message);
+      return;
+    }
+
+    // Fetch the logged-in user's mapped Metabase name
+    const user = data.user;
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('designer_name')
+      .eq('id', user.id)
+      .single();
+
+    const designerName = profile.designer_name;
+    loadDashboardForDesigner(designerName);
+  }
+
+  // 3. LOAD FILTERED METABASE DASHBOARD
+  function loadDashboardForDesigner(designerName) {
+    const baseUrl = "https://insights.24slides.dev/public/dashboard/76c6e580-25e1-4c78-8b0b-69b2976a4c8d";
+    // Filter Metabase by passing the designer name parameter
+    const iframeUrl = `${baseUrl}?date_filter=past1months&designer_name=${encodeURIComponent(designerName)}`;
+    
+    document.getElementById("dashboard-iframe").src = iframeUrl;
+  }
+</script>
